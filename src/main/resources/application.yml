@@ -1,0 +1,33 @@
+server:
+  port: 8081
+
+spring:
+    datasource:
+        url: jdbc:sqlserver://localhost:1433;trustServerCertificate=true;databaseName=SystemConfiguration;
+        username: sa
+        password: Admin123!@#
+        driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    data:
+      redis:
+        database: 0
+        host: localhost
+        port: 6379
+        password: Admin123!@#
+        connect-timeout: 5000
+    flyway:
+      url: jdbc:sqlserver://localhost:1433;trustServerCertificate=true;databaseName=SystemConfiguration;
+      user: sa
+      password: Admin123!@#
+      enabled: false
+    kafka:
+        create-topics: true
+        topic-name: settings
+        number-of-partitions: 4
+        bootstrap-servers: localhost:29092
+
+springdoc:
+  api-docs:
+    version: openapi_3_0
+  swagger-ui:
+    use-root-path: true
+

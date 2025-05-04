@@ -1,0 +1,30 @@
+### GET request to example server
+GET http://localhost:8081/settings/test/test1
+
+###
+
+### GET request to example server
+GET http://localhost:8081/settings/test/test1
+
+###
+
+
+### GET request to example server
+POST http://localhost:8081/settings/test/test
+Content-Type: application/json
+
+{
+  "value": "d1"
+}
+
+###
+
+### GET request to example server
+PUT http://localhost:8081/settings/test/test
+Content-Type: application/json
+
+{
+  "value": "1"
+}
+
+###

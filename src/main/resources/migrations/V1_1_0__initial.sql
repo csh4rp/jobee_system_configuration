@@ -1,0 +1,15 @@
+CREATE TABLE [dbo].[Setting]
+(
+    [Id] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
+    [Context] NVARCHAR(255) NOT NULL,
+    [Name] NVARCHAR(255) NOT NULL,
+    [Value] NVARCHAR(MAX) NOT NULL,
+    [Author] NVARCHAR(255) NOT NULL,
+    [ValidFrom] DATETIME2 GENERATED ALWAYS AS ROW START,
+    [ValidTo] DATETIME2 GENERATED ALWAYS AS ROW END,
+    PERIOD FOR SYSTEM_TIME(ValidFrom, ValidTo)
+)
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[SettingHistory]));
+
+CREATE UNIQUE INDEX [IX_Setting_Context_Name] ON [dbo].[Setting] ([Context], [Name]);
+
