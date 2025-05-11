@@ -4,13 +4,13 @@ import com.jobee.systemconfiguration.application.caching.SettingCacheService;
 import com.jobee.systemconfiguration.application.exceptions.ConflictException;
 import com.jobee.systemconfiguration.application.exceptions.EntityNotFoundException;
 import com.jobee.systemconfiguration.application.messaging.MessagingService;
-import com.jobee.systemconfiguration.contracts.SettingChangedEvent;
 import com.jobee.systemconfiguration.contracts.SettingModel;
 import com.jobee.systemconfiguration.domain.Setting;
+import com.jobee.systemconfiguration.domain.SettingChanged;
 import com.jobee.systemconfiguration.domain.SettingRepository;
+import io.micrometer.observation.annotation.Observed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -30,6 +30,7 @@ public class SettingService {
         this.messagingService = messagingService;
     }
 
+    @Observed(name = "getSetting")
     public SettingModel getSetting(String context, String name, LocalDateTime time) {
 
         LocalDateTime settingTime = time;
@@ -54,6 +55,7 @@ public class SettingService {
         return new SettingModel(setting.getContext(), setting.getName(), setting.getValue());
     }
 
+    @Observed(name = "createSetting")
     public void create(SettingModel model) {
 
         Optional<Setting> existingSetting = settingRepository.findByContextAndName(model.context(), model.name());
@@ -62,29 +64,30 @@ public class SettingService {
             throw new ConflictException(String.format("Setting '%s:%s' already exists", model.context(), model.name()));
         }
 
-        Setting setting = new Setting(model.context(), model.name(), model.value(), "");
+        Setting setting = new Setting(model.context(), model.name(), model.value(), "SYSTEM");
 
         settingRepository.save(setting);
 
         log.info("Created setting '{}:{}'", model.context(), model.name());
     }
 
+    @Observed(name = "updateSetting")
     public void update(SettingModel model) {
 
         Setting setting = settingRepository.findByContextAndName(model.context(), model.name())
                 .orElseThrow(EntityNotFoundException::new);
 
         if (model.value().equals(setting.getValue())) {
-            log.info("Setting '{}:{}' was not updated, because value of: '{}' matches old value", model.context(), model.name(), model.value());
+            log.warn("Setting '{}:{}' was not updated, because value of: '{}' matches old value", model.context(), model.name(), model.value());
             return;
         }
 
-        setting.setValue(model.value());
-        messagingService.publish(new SettingChangedEvent(setting.getContext(), setting.getName(), setting.getValue()));
+        SettingChanged event = new SettingChanged(setting.getContext(), setting.getName(), setting.getValue(), model.value());
 
-        log.info("Updated setting '{}:{}' with value '{}'", model.context(), model.name(), model.value());
+        messagingService.publish(event);
     }
 
+    @Observed(name = "getSettings")
     public Collection<SettingModel> getSettings(String context, Collection<String> names, LocalDateTime time) {
 
         Collection<Setting> settings = settingRepository.findAll(time, context, names);
@@ -99,5 +102,4 @@ public class SettingService {
                 .map(s -> new SettingModel(s.getContext(), s.getName(), s.getValue()))
                 .toList();
     }
-
 }

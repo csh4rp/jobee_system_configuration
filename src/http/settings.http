@@ -4,7 +4,7 @@ GET http://localhost:8081/settings/test/test1
 ###
 
 ### GET request to example server
-GET http://localhost:8081/settings/test/test1
+GET http://localhost:8081/settings/test/test
 
 ###
 
@@ -14,7 +14,7 @@ POST http://localhost:8081/settings/test/test
 Content-Type: application/json
 
 {
-  "value": "d1"
+  "value": "d12"
 }
 
 ###
@@ -24,7 +24,7 @@ PUT http://localhost:8081/settings/test/test
 Content-Type: application/json
 
 {
-  "value": "1"
+  "value": "12"
 }
 
 ###

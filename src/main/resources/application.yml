@@ -7,6 +7,7 @@ spring:
         username: sa
         password: Admin123!@#
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
     data:
       redis:
         database: 0
@@ -21,7 +22,7 @@ spring:
       enabled: false
     kafka:
         create-topics: true
-        topic-name: settings
+        topic-name: event-log
         number-of-partitions: 4
         bootstrap-servers: localhost:29092
 
@@ -31,3 +32,16 @@ springdoc:
   swagger-ui:
     use-root-path: true
 
+management:
+  otlp:
+    metrics:
+      export:
+        # Supported configs
+        url: "https://otlp.example.com:4318/v1/metrics"
+        batchSize: 15000
+        aggregationTemporality: "cumulative"
+        headers:
+          header1: value1
+        step: 30s
+        resourceAttributes:
+          key1: value1

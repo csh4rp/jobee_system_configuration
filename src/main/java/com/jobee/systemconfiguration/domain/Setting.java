@@ -38,5 +38,6 @@ public class Setting {
         this.context = context;
         this.name = name;
         this.value = value;
+        this.author = author;
     }
 }
